@@ -30,7 +30,7 @@ app.on('ready', async () => {
         const data = await fs.readFile('config.json', 'utf8');
         config = JSON.parse(data);
         if (config.startup === false) {
-            win.loadFile('data/startup/index.html');
+            win.loadFile('index.html');
         } else {
             win.loadFile('index.html');
         }
