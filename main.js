@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const fs = require('fs').promises;
 const remoteMain = require('@electron/remote/main'); 
+const sharp = require('sharp'); // 追加
+
 remoteMain.initialize(); 
 
 let win;
@@ -30,7 +32,7 @@ app.on('ready', async () => {
         const data = await fs.readFile('config.json', 'utf8');
         config = JSON.parse(data);
         if (config.startup === false) {
-            win.loadFile('data/startup/index.html');
+            win.loadFile('index.html');
         } else {
             win.loadFile('index.html');
         }
@@ -59,4 +61,46 @@ ipcMain.on('go-back-to-home', (event) => {
     if (win) {
         win.loadFile('index.html');
     }
+});
+
+ipcMain.handle('upscale-image', async (event, buffer, ext) => {
+  try {
+    let sharpImage = sharp(Buffer.from(buffer));
+    const metadata = await sharpImage.metadata();
+
+    sharpImage = sharpImage
+      .resize({
+        width: metadata.width * 2,
+        height: metadata.height * 2,
+        kernel: 'cubic',
+        fit: 'contain',
+      })
+      .sharpen({
+        sigma: 3,
+        flat: 3.0,
+        jagged: 4.0
+      })
+      .modulate({
+        brightness: 1.07,
+        saturation: 1.12,
+        contrast: 1.15
+      });
+
+    let upscaledBuffer;
+    if (ext === 'jpeg' || ext === 'jpg') {
+      upscaledBuffer = await sharpImage.jpeg({ quality: 95 }).toBuffer();
+    } else if (ext === 'png') {
+      upscaledBuffer = await sharpImage.png({ compressionLevel: 9 }).toBuffer();
+    } else if (ext === 'tiff') {
+      upscaledBuffer = await sharpImage.tiff({ quality: 95 }).toBuffer();
+    } else if (ext === 'webp') {
+      upscaledBuffer = await sharpImage.webp({ quality: 95 }).toBuffer();
+    } else {
+      upscaledBuffer = await sharpImage.toBuffer();
+    }
+    return upscaledBuffer.toString('base64');
+  } catch (e) {
+    console.error('Main process upscaling error:', e);
+    throw e;
+  }
 });

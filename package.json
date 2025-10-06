@@ -1,8 +1,8 @@
 {
   "name": "imgup",
-  "version": "1.10.0",
+  "version": "1.10.5",
   "devversion": "dev-2.3",
-  "main": "main.js",
+  "main": "./main.js",
   "description": "画像を鮮明に。",
   "author": "project・Mero",
   "scripts": {
