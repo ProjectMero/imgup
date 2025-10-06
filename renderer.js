@@ -1,6 +1,4 @@
 const { ipcRenderer } = require('electron');
-const sharp = require('sharp');
-const fs = require('fs').promises;
 
 document.getElementById('settingsIcon').addEventListener('click', () => {
   window.location.href = './data/setting/index.html';
@@ -184,42 +182,10 @@ async function upscaleImage() {
 
   try {
     const arrayBuffer = await file.arrayBuffer();
-    let sharpImage = sharp(arrayBuffer);
-    const metadata = await sharpImage.metadata();
-
-    sharpImage = sharpImage
-      .resize({
-        width: metadata.width * 2,
-        height: metadata.height * 2,
-        kernel: 'cubic',
-        fit: 'contain',
-      })
-      .sharpen({
-        sigma: 3,      
-        flat: 3.0,     
-        jagged: 4.0    
-      })
-      .modulate({
-        brightness: 1.07,   
-        saturation: 1.12,   
-        contrast: 1.15      
-      });
-
-    let upscaledBuffer;
     const ext = file.type.split('/')[1];
-    if (ext === 'jpeg' || ext === 'jpg') {
-      upscaledBuffer = await sharpImage.jpeg({ quality: 95 }).toBuffer();
-    } else if (ext === 'png') {
-      upscaledBuffer = await sharpImage.png({ compressionLevel: 9 }).toBuffer();
-    } else if (ext === 'tiff') {
-      upscaledBuffer = await sharpImage.tiff({ quality: 95 }).toBuffer();
-    } else if (ext === 'webp') {
-      upscaledBuffer = await sharpImage.webp({ quality: 95 }).toBuffer();
-    } else {
-      upscaledBuffer = await sharpImage.toBuffer();
-    }
+    const result = await ipcRenderer.invoke('upscale-image', Buffer.from(arrayBuffer), ext);
 
-    if (upscaledImage) upscaledImage.src = `data:image/${ext};base64,${upscaledBuffer.toString('base64')}`;
+    if (upscaledImage) upscaledImage.src = `data:image/${ext};base64,${result}`;
     if (upscaling) upscaling.style.display = 'none';
     if (completed) completed.style.display = 'block';
     console.log('Upscaling completed');
