@@ -36,6 +36,7 @@ if (!upscaledImage) console.error('upscaledImage element not found');
 const saveBtn = document.getElementById('saveBtn');
 if (!saveBtn) console.error('saveBtn element not found');
 
+
 dropZone.addEventListener('dragover', (e) => {
   e.preventDefault();
   console.log('Drag over detected');
