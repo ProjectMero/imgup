@@ -1,0 +1,21 @@
+{
+  "name": "imgup-ts",
+  "version": "1.0.0",
+  "description": "An image upload application using Electron and TypeScript.",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^latest"
+  },
+  "devDependencies": {
+    "typescript": "^latest",
+    "@types/node": "^latest",
+    "@types/electron": "^latest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
