@@ -1,7 +1,7 @@
 {
   "name": "imgup",
   "version": "2.0.0",
-  "description": "An image upload application using Electron and TypeScript.",
+  "description": "画像を鮮明に。",
   "main": "dist/main.js",
   "scripts": {
     "build": "tsc",
